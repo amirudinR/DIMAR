@@ -88,6 +88,10 @@ export const STEPS = [
 ];
 
 export const CONTACT = {
-  whatsapp: '[NOMOR WHATSAPP]',
+  whatsapp: '+62 823-5020-8520',
+  waLink: 'https://wa.me/6282350208520',
   email: '[EMAIL]',
 };
+
+export const waLink = (text) =>
+  text ? `${CONTACT.waLink}?text=${encodeURIComponent(text)}` : CONTACT.waLink;

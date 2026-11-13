@@ -1,5 +1,5 @@
 import Logo from './Logo.jsx';
-import { NAV, SERVICES, PACKAGES, STEPS, CONTACT } from './data.js';
+import { NAV, SERVICES, PACKAGES, STEPS, CONTACT, waLink } from './data.js';
 
 const container = { maxWidth: '1200px', margin: '0 auto', padding: '0 24px' };
 const sectionHead = { maxWidth: '640px', marginBottom: '40px' };
@@ -93,7 +93,7 @@ export default function App() {
                 {item.label}
               </a>
             ))}
-            <a href="#kontak" style={btnNavy}>
+            <a href={waLink('Halo DIMAR Technology, saya ingin bertanya tentang layanan website dan aplikasi.')} style={btnNavy}>
               Hubungi Kami
             </a>
           </nav>
@@ -111,7 +111,7 @@ export default function App() {
                 DIMAR Technology membuat website dan aplikasi yang modern, cepat, dan siap tumbuh bersama usaha Anda.
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-                <a href="#kontak" style={btnCyan}>Konsultasi Gratis</a>
+                <a href={waLink('Halo DIMAR Technology, saya ingin konsultasi gratis.')} style={btnCyan}>Konsultasi Gratis</a>
                 <a href="#layanan" style={btnGhost}>Lihat Layanan</a>
               </div>
             </div>
@@ -211,7 +211,10 @@ export default function App() {
                     <li key={f} style={{ margin: '0 0 10px', color: p.dark ? '#C7D3EA' : '#4A5B7F' }}>{f}</li>
                   ))}
                 </ul>
-                <a href="#kontak" style={p.dark ? { ...btn, background: '#fff', color: '#0B1F4D' } : btnBlue}>
+                <a
+                  href={waLink(`Halo DIMAR Technology, saya tertarik dengan paket ${p.name}.`)}
+                  style={p.dark ? { ...btn, background: '#fff', color: '#0B1F4D' } : btnBlue}
+                >
                   Pilih paket
                 </a>
               </div>
@@ -259,7 +262,9 @@ export default function App() {
             <p style={{ margin: '0', fontSize: '18px', lineHeight: '1.6', color: '#C7D3EA' }}>
               Ceritakan kebutuhan Anda, kami bantu wujudkan.
             </p>
-            <a href="#kontak" style={btnCyan}>Hubungi via WhatsApp</a>
+            <a href={waLink('Halo DIMAR Technology, saya ingin membuat website.')} style={btnCyan}>
+              Hubungi via WhatsApp
+            </a>
           </div>
         </div>
       </section>
@@ -268,7 +273,11 @@ export default function App() {
         <div style={{ ...container, display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center', justifyContent: 'space-between' }}>
           <Logo id="ftr" width="184" height="40" accent="#2DE2E6" accent2="#3B82F6" textColor="#E8F1FF" />
           <div style={{ color: '#C7D3EA', fontSize: '15px', lineHeight: '1.7' }}>
-            {CONTACT.whatsapp} · {CONTACT.email}
+            <a href={CONTACT.waLink} style={{ color: '#C7D3EA', textDecoration: 'none' }}>
+              {CONTACT.whatsapp}
+            </a>
+            {' · '}
+            {CONTACT.email}
             <br />© 2026 DIMAR Technology
           </div>
         </div>
