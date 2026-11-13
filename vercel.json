@@ -3,5 +3,6 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [{ "source": "/((?!assets/|favicon|apple-touch-icon).*)", "destination": "/index.html" }]
 }

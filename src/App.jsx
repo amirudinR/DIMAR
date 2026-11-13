@@ -90,23 +90,42 @@ function Reveal({ children, delay = 0, as: Tag = 'div', style, ...rest }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setVisible(true);
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const revealNow = () => setVisible(true);
+
+    if (reduce || typeof IntersectionObserver === 'undefined') {
+      revealNow();
       return;
     }
+
+    // Anything already within (or above) the viewport shows immediately.
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92) {
+      revealNow();
+      return;
+    }
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisible(true);
+            revealNow();
             io.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.15, rootMargin: '0px 0px -60px 0px' },
+      { threshold: 0.01, rootMargin: '0px 0px -40px 0px' },
     );
     io.observe(el);
-    return () => io.disconnect();
+
+    // Safety net: never leave content permanently invisible.
+    const fallback = window.setTimeout(revealNow, 2500);
+
+    return () => {
+      io.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   return (
@@ -543,11 +562,15 @@ export default function App() {
               Paket layanan
             </h2>
             <p style={lead}>Harga disesuaikan dengan kebutuhan Anda.</p>
+            <a href="/paket" className="btn btn-blue" style={{ ...btnBlue, marginTop: '18px' }}>
+              Lihat semua paket &amp; harga
+              <ArrowRight size={17} strokeWidth={2.4} />
+            </a>
           </Reveal>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: '24px' }}>
-            {PACKAGES.map((p, i) => (
+            {PACKAGES.slice(0, 3).map((p, i) => (
               <Reveal
-                key={p.name}
+                key={p.id}
                 delay={i * 70}
                 className="card"
                 style={{
@@ -557,9 +580,13 @@ export default function App() {
                   border: `1px solid ${p.dark ? '#0B1F4D' : '#DCE5F5'}`,
                 }}
               >
-                {p.dark && <span className="paket-badge">Paling populer</span>}
+                {p.badge && <span className="paket-badge">{p.badge}</span>}
+                <span className="home-pkg-group">{p.group}</span>
                 <h3 style={{ margin: '0', fontSize: '22px', color: p.dark ? '#fff' : '#0B1F4D' }}>{p.name}</h3>
-                <div style={{ fontSize: '34px', fontWeight: '800', color: p.dark ? '#fff' : '#0B1F4D' }}>{p.price}</div>
+                <div style={{ fontSize: '13px', fontWeight: '600', letterSpacing: '0.04em', textTransform: 'uppercase', color: p.dark ? '#93a6c9' : '#93a6c9' }}>
+                  {p.priceNote}
+                </div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: p.dark ? '#fff' : '#0B1F4D' }}>{p.price}</div>
                 <ul className="feature-list" style={{ margin: '8px 0 16px' }}>
                   {p.features.map((f) => (
                     <li key={f} style={{ color: p.dark ? '#C7D3EA' : '#4A5B7F' }}>
@@ -568,14 +595,25 @@ export default function App() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={waLink(`Halo DIMAR Technology, saya tertarik dengan paket ${p.name}.`)}
-                  className={`btn ${p.dark ? 'btn-white' : 'btn-blue'}`}
-                  style={{ ...(p.dark ? btnWhite : btnBlue), marginTop: 'auto' }}
-                >
-                  Pilih paket
-                  <ArrowRight size={17} strokeWidth={2.4} />
-                </a>
+                {p.dark ? (
+                  <a
+                    href={waLink(`Halo DIMAR Technology, saya tertarik dengan paket ${p.name} (${p.price}).`)}
+                    className="btn btn-white"
+                    style={{ ...btnWhite, marginTop: 'auto' }}
+                  >
+                    Pilih paket
+                    <ArrowRight size={17} strokeWidth={2.4} />
+                  </a>
+                ) : (
+                  <a
+                    href={waLink(`Halo DIMAR Technology, saya tertarik dengan paket ${p.name} (${p.price}).`)}
+                    className="btn btn-blue"
+                    style={{ ...btnBlue, marginTop: 'auto' }}
+                  >
+                    Pilih paket
+                    <ArrowRight size={17} strokeWidth={2.4} />
+                  </a>
+                )}
               </Reveal>
             ))}
           </div>
