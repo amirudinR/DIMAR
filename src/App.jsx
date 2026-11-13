@@ -12,9 +12,13 @@ import {
   Mail,
   Menu,
   X,
+  User,
+  Phone,
+  Send,
+  AlertCircle,
 } from 'lucide-react';
 import Logo from './Logo.jsx';
-import { NAV, SERVICES, PACKAGES, STEPS, CONTACT, waLink } from './data.js';
+import { NAV, SERVICES, PACKAGES, STEPS, CONTACT, SERVICE_OPTIONS, waLink } from './data.js';
 
 const container = { maxWidth: '1200px', margin: '0 auto', padding: '0 24px' };
 const sectionHead = { maxWidth: '640px', marginBottom: '40px' };
@@ -149,6 +153,186 @@ function FaqItem({ item, open, onToggle }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------- contact form -> WhatsApp ---------- */
+const fieldStyle = {
+  width: '100%',
+  padding: '13px 16px',
+  borderRadius: '12px',
+  border: '1px solid #DCE5F5',
+  background: '#fff',
+  color: '#0B1F4D',
+  fontFamily: 'inherit',
+  fontSize: '15.5px',
+  outline: 'none',
+  transition: 'border-color 320ms var(--ease-ios), box-shadow 320ms var(--ease-ios)',
+};
+const labelStyle = {
+  display: 'block',
+  marginBottom: '7px',
+  fontSize: '13.5px',
+  fontWeight: '600',
+  color: '#0B1F4D',
+  letterSpacing: '0.01em',
+};
+
+function ContactForm() {
+  const [form, setForm] = useState({ nama: '', whatsapp: '', layanan: '', pesan: '' });
+  const [errors, setErrors] = useState({});
+  const [sent, setSent] = useState(false);
+
+  const update = (key) => (e) => {
+    setForm((f) => ({ ...f, [key]: e.target.value }));
+    setErrors((err) => (err[key] ? { ...err, [key]: undefined } : err));
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    const next = {};
+    if (!form.nama.trim()) next.nama = 'Nama wajib diisi.';
+    const digits = form.whatsapp.replace(/[^0-9]/g, '');
+    if (!digits) next.whatsapp = 'Nomor WhatsApp wajib diisi.';
+    else if (digits.length < 9) next.whatsapp = 'Nomor terlalu pendek.';
+    if (!form.layanan) next.layanan = 'Pilih salah satu layanan.';
+    if (!form.pesan.trim()) next.pesan = 'Ceritakan sedikit kebutuhan Anda.';
+
+    if (Object.keys(next).length > 0) {
+      setErrors(next);
+      return;
+    }
+
+    const lines = [
+      'Halo DIMAR Technology, saya ingin konsultasi.',
+      '',
+      `Nama: ${form.nama.trim()}`,
+      `WhatsApp: ${form.whatsapp.trim()}`,
+      `Layanan: ${form.layanan}`,
+      '',
+      'Kebutuhan:',
+      form.pesan.trim(),
+    ];
+
+    window.open(waLink(lines.join('\n')), '_blank', 'noopener,noreferrer');
+    setSent(true);
+  };
+
+  return (
+    <form onSubmit={submit} noValidate className="contact-form">
+      <div className="contact-grid">
+        <div>
+          <label style={labelStyle} htmlFor="cf-nama">
+            Nama
+          </label>
+          <div className="input-wrap">
+            <User size={17} className="input-icon" />
+            <input
+              id="cf-nama"
+              type="text"
+              value={form.nama}
+              onChange={update('nama')}
+              placeholder="Nama Anda"
+              style={fieldStyle}
+              className={`field has-icon${errors.nama ? ' invalid' : ''}`}
+              aria-invalid={Boolean(errors.nama)}
+            />
+          </div>
+          {errors.nama && (
+            <p className="field-error">
+              <AlertCircle size={14} /> {errors.nama}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label style={labelStyle} htmlFor="cf-wa">
+            Nomor WhatsApp
+          </label>
+          <div className="input-wrap">
+            <Phone size={17} className="input-icon" />
+            <input
+              id="cf-wa"
+              type="tel"
+              inputMode="tel"
+              value={form.whatsapp}
+              onChange={update('whatsapp')}
+              placeholder="08xx xxxx xxxx"
+              style={fieldStyle}
+              className={`field has-icon${errors.whatsapp ? ' invalid' : ''}`}
+              aria-invalid={Boolean(errors.whatsapp)}
+            />
+          </div>
+          {errors.whatsapp && (
+            <p className="field-error">
+              <AlertCircle size={14} /> {errors.whatsapp}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div style={{ marginTop: '18px' }}>
+        <label style={labelStyle} htmlFor="cf-layanan">
+          Jenis layanan
+        </label>
+        <select
+          id="cf-layanan"
+          value={form.layanan}
+          onChange={update('layanan')}
+          style={{ ...fieldStyle, cursor: 'pointer' }}
+          className={`field${errors.layanan ? ' invalid' : ''}`}
+          aria-invalid={Boolean(errors.layanan)}
+        >
+          <option value="">Pilih layanan…</option>
+          {SERVICE_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+        {errors.layanan && (
+          <p className="field-error">
+            <AlertCircle size={14} /> {errors.layanan}
+          </p>
+        )}
+      </div>
+
+      <div style={{ marginTop: '18px' }}>
+        <label style={labelStyle} htmlFor="cf-pesan">
+          Kebutuhan Anda
+        </label>
+        <textarea
+          id="cf-pesan"
+          rows={4}
+          value={form.pesan}
+          onChange={update('pesan')}
+          placeholder="Contoh: saya punya usaha kuliner dan butuh website company profile plus menu online."
+          style={{ ...fieldStyle, resize: 'vertical', lineHeight: '1.6' }}
+          className={`field${errors.pesan ? ' invalid' : ''}`}
+          aria-invalid={Boolean(errors.pesan)}
+        />
+        {errors.pesan && (
+          <p className="field-error">
+            <AlertCircle size={14} /> {errors.pesan}
+          </p>
+        )}
+      </div>
+
+      <button type="submit" className="btn btn-navy" style={{ ...btnNavy, width: '100%', marginTop: '22px' }}>
+        <Send size={17} strokeWidth={2.2} />
+        Kirim lewat WhatsApp
+      </button>
+
+      <p className="form-note">
+        {sent ? (
+          <span className="form-ok">
+            <Check size={15} strokeWidth={3} /> WhatsApp terbuka di tab baru. Kalau tidak terbuka, cek pemblokir pop-up.
+          </span>
+        ) : (
+          'Pesan akan langsung terisi otomatis di WhatsApp Anda — tidak perlu ketik ulang.'
+        )}
+      </p>
+    </form>
   );
 }
 
@@ -442,22 +626,48 @@ export default function App() {
 
       <section id="kontak" className="section-pad" style={{ background: '#0B1F4D', padding: '88px 0' }}>
         <div style={container}>
-          <Reveal style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px', maxWidth: '680px' }}>
-            <h2 className="section-title" style={{ margin: '0', fontSize: '38px', lineHeight: '1.15', color: '#fff' }}>
-              Siap punya website sendiri?
-            </h2>
-            <p style={{ margin: '0', fontSize: '18px', lineHeight: '1.6', color: '#C7D3EA' }}>Ceritakan kebutuhan Anda, kami bantu wujudkan.</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-              <a href={waLink('Halo DIMAR Technology, saya ingin membuat website.')} className="btn btn-cyan" style={btnCyan}>
-                <MessageCircle size={18} strokeWidth={2.2} />
-                Hubungi via WhatsApp
-              </a>
-              <a href={`mailto:${CONTACT.email}`} className="btn btn-ghost" style={btnGhost}>
-                <Mail size={18} strokeWidth={2.2} />
-                Kirim email
-              </a>
-            </div>
-          </Reveal>
+          <div className="contact-layout">
+            <Reveal className="contact-copy">
+              <h2 className="section-title" style={{ margin: '0 0 14px', fontSize: '38px', lineHeight: '1.15', color: '#fff' }}>
+                Siap punya website sendiri?
+              </h2>
+              <p style={{ margin: '0 0 26px', fontSize: '18px', lineHeight: '1.6', color: '#C7D3EA', maxWidth: '440px' }}>
+                Ceritakan kebutuhan Anda, kami bantu wujudkan. Isi form singkat ini dan pesan Anda langsung masuk ke WhatsApp kami.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '26px' }}>
+                <a href={CONTACT.waLink} className="contact-line">
+                  <span className="contact-ic">
+                    <MessageCircle size={17} strokeWidth={2.2} />
+                  </span>
+                  <span>
+                    <small>WhatsApp</small>
+                    {CONTACT.whatsapp}
+                  </span>
+                </a>
+                <a href={`mailto:${CONTACT.email}`} className="contact-line">
+                  <span className="contact-ic">
+                    <Mail size={17} strokeWidth={2.2} />
+                  </span>
+                  <span>
+                    <small>Email</small>
+                    {CONTACT.email}
+                  </span>
+                </a>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px' }} className="cta-row">
+                <a href={waLink('Halo DIMAR Technology, saya ingin membuat website.')} className="btn btn-cyan" style={btnCyan}>
+                  <MessageCircle size={18} strokeWidth={2.2} />
+                  Chat langsung
+                </a>
+              </div>
+            </Reveal>
+
+            <Reveal delay={100} className="contact-form-card">
+              <ContactForm />
+            </Reveal>
+          </div>
         </div>
       </section>
 

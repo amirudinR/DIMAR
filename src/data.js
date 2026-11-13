@@ -93,5 +93,15 @@ export const CONTACT = {
   email: 'dimasmandala2199@gmail.com',
 };
 
+export const SERVICE_OPTIONS = [
+  'Company Profile',
+  'Landing Page',
+  'Toko Online',
+  'Aplikasi Web',
+  'Aplikasi Mobile',
+  'Sistem & Dashboard',
+  'Belum tahu, mau konsultasi dulu',
+];
+
 export const waLink = (text) =>
   text ? `${CONTACT.waLink}?text=${encodeURIComponent(text)}` : CONTACT.waLink;
