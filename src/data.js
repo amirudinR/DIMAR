@@ -90,7 +90,7 @@ export const STEPS = [
 export const CONTACT = {
   whatsapp: '+62 823-5020-8520',
   waLink: 'https://wa.me/6282350208520',
-  email: '[EMAIL]',
+  email: 'dimasmandala2199@gmail.com',
 };
 
 export const waLink = (text) =>
